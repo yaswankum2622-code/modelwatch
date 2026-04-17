@@ -13,6 +13,10 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 SAVED_DIR = Path(__file__).parent.parent / "models" / "saved"
+GEMINI_MODELS = [
+    "gemini-2.5-flash-preview-04-17",
+    "gemini-2.5-flash",
+]
 
 
 def generate_drift_report(
@@ -39,10 +43,6 @@ def generate_drift_report(
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            "gemini-2.5-flash"
-        )
-
         red_alerts = [a for a in alerts if a["level"] == "RED"]
         amber_alerts = [a for a in alerts if a["level"] == "AMBER"]
 
@@ -118,13 +118,24 @@ Maximum 350 words total. No markdown headers with # symbols.
 Use **bold** for section names only.
 """
 
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.4,
-                max_output_tokens=1000,
-            )
-        )
+        response_text = None
+        for model_name in GEMINI_MODELS:
+            try:
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(
+                    prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.4,
+                        max_output_tokens=1000,
+                    )
+                )
+                response_text = response.text.strip()
+                break
+            except Exception:
+                continue
+
+        if not response_text:
+            raise RuntimeError("No Gemini model call succeeded.")
 
         import datetime
 
@@ -139,7 +150,7 @@ Use **bold** for section names only.
             + "\n\n"
         )
 
-        return header + response.text.strip()
+        return header + response_text
 
     except Exception:
         return _fallback_report(

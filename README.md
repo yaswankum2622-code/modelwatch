@@ -4,20 +4,22 @@ emoji: "🔭"
 colorFrom: indigo
 colorTo: blue
 sdk: docker
+app_file: app.py
 app_port: 7860
 python_version: "3.10"
 fullWidth: true
 header: mini
-short_description: ML drift monitoring for credit-risk models.
+short_description: Credit-risk ML drift observatory.
 license: mit
 pinned: true
 ---
 
 <div align="center">
 
-# ModelWatch
+<h1>MODELWATCH</h1>
 
-### Production ML monitoring for data drift, quality degradation, behaviour shift, and retraining decisions
+<p><strong>Production ML drift observatory for credit-risk systems.</strong></p>
+<p>Detect distribution shift, performance decay, behaviour drift, anomaly spikes, and retraining readiness before the model silently fails in production.</p>
 
 [![Live App](https://img.shields.io/badge/Live%20App-yaswtutu--modelwatch-0F766E?style=for-the-badge)](https://yaswtutu-modelwatch.hf.space)
 [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-F59E0B?style=for-the-badge)](https://huggingface.co/spaces/yaswtutu/modelwatch)
@@ -28,7 +30,7 @@ pinned: true
 <br>
 
 ModelWatch is a production-style monitoring platform built on the UCI Credit Card Default dataset.  
-It simulates what happens after a model ships: the data distribution moves, model quality erodes, feature importance shifts, anomalies rise, and the team must decide whether to retrain.
+It shows the full post-deployment story: the data moves, quality erodes, feature importance shifts, anomalies rise, and the team needs an evidence-based retraining decision.
 
 </div>
 
@@ -140,26 +142,6 @@ This is the core operating view of the project: one baseline and three progressi
 | **Deep drift lab** | Autoencoder and Isolation Forest signals | Captures stress even when classical feature thresholds do not yet look extreme |
 | **SHAP drift page** | Feature-importance rank movement | Detects behaviour drift: the model may still run, but for the wrong reasons |
 | **Executive drift narrative** | AI-generated explanation for stakeholders | Converts monitoring metrics into an action-oriented operational brief |
-
----
-
-## Visual tour
-
-| Overview | Data drift atlas |
-|---|---|
-| ![Overview](visual%27s/Screenshot%202026-04-17%20125256.png) | ![Data Drift Atlas](visual%27s/Screenshot%202026-04-17%20125328.png) |
-
-| Top drifted features | Evidently drift report |
-|---|---|
-| ![Top drifted features](visual%27s/Screenshot%202026-04-17%20125504.png) | ![Evidently report](visual%27s/Screenshot%202026-04-17%20125541.png) |
-
-| Performance observatory | Deep drift lab |
-|---|---|
-| ![Performance observatory](visual%27s/Screenshot%202026-04-17%20125708.png) | ![Deep drift lab](visual%27s/Screenshot%202026-04-17%20125740.png) |
-
-| Executive drift narrative |
-|---|
-| ![Executive drift narrative](visual%27s/Screenshot%202026-04-17%20125829.png) |
 
 ---
 

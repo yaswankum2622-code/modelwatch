@@ -49,39 +49,64 @@ DRIFT_CONFIG = {
 RANDOM_SEED = 2026
 
 
+def _apply_window_drift(
+    frame: pd.DataFrame,
+    window_id: int,
+    config: dict[str, float | int | str],
+    generator: np.random.Generator,
+) -> pd.DataFrame:
+    """Apply one drift profile to a single monitoring window."""
+    drifted = frame.copy()
+    mask = drifted["window_id"] == window_id
+    window_slice = drifted.loc[mask].copy()
+
+    bill_values = window_slice[BILL_COLUMNS].to_numpy(dtype=float) * float(config["bill_scale"])
+    drifted.loc[mask, BILL_COLUMNS] = np.rint(bill_values).astype(int)
+
+    payment_values = (
+        window_slice[PAY_AMOUNT_COLUMNS].to_numpy(dtype=float) * float(config["payment_scale"])
+    )
+    drifted.loc[mask, PAY_AMOUNT_COLUMNS] = np.rint(np.clip(payment_values, 0, None)).astype(int)
+
+    limit_balance = window_slice["LIMIT_BAL"].to_numpy(dtype=float) * float(config["limit_scale"])
+    drifted.loc[mask, "LIMIT_BAL"] = np.rint(np.clip(limit_balance, 10_000, None) / 1_000) * 1_000
+
+    increments = generator.binomial(
+        n=int(config["status_steps"]),
+        p=float(config["status_probability"]),
+        size=(mask.sum(), len(PAY_STATUS_COLUMNS)),
+    )
+    updated_status = np.clip(
+        window_slice[PAY_STATUS_COLUMNS].to_numpy(dtype=int) + increments,
+        -2,
+        8,
+    )
+    drifted.loc[mask, PAY_STATUS_COLUMNS] = updated_status.astype(int)
+    drifted["LIMIT_BAL"] = drifted["LIMIT_BAL"].astype(int)
+    return drifted
+
+
+def inject_mild(frame: pd.DataFrame, generator: np.random.Generator) -> pd.DataFrame:
+    """Inject the mild drift profile into window two."""
+    return _apply_window_drift(frame, window_id=2, config=DRIFT_CONFIG[2], generator=generator)
+
+
+def inject_moderate(frame: pd.DataFrame, generator: np.random.Generator) -> pd.DataFrame:
+    """Inject the moderate drift profile into window three."""
+    return _apply_window_drift(frame, window_id=3, config=DRIFT_CONFIG[3], generator=generator)
+
+
+def inject_severe(frame: pd.DataFrame, generator: np.random.Generator) -> pd.DataFrame:
+    """Inject the severe drift profile into window four."""
+    return _apply_window_drift(frame, window_id=4, config=DRIFT_CONFIG[4], generator=generator)
+
+
 def inject_drift(raw_frame: pd.DataFrame, random_seed: int = RANDOM_SEED) -> pd.DataFrame:
     """Apply progressive synthetic drift to windows two through four."""
-    drifted = raw_frame.copy()
     generator = np.random.default_rng(random_seed)
-
-    for window_id, config in DRIFT_CONFIG.items():
-        mask = drifted["window_id"] == window_id
-        window_slice = drifted.loc[mask].copy()
-
-        bill_values = window_slice[BILL_COLUMNS].to_numpy(dtype=float) * config["bill_scale"]
-        drifted.loc[mask, BILL_COLUMNS] = np.rint(bill_values).astype(int)
-
-        payment_values = (
-            window_slice[PAY_AMOUNT_COLUMNS].to_numpy(dtype=float) * config["payment_scale"]
-        )
-        drifted.loc[mask, PAY_AMOUNT_COLUMNS] = np.rint(np.clip(payment_values, 0, None)).astype(int)
-
-        limit_balance = window_slice["LIMIT_BAL"].to_numpy(dtype=float) * config["limit_scale"]
-        drifted.loc[mask, "LIMIT_BAL"] = np.rint(np.clip(limit_balance, 10_000, None) / 1_000) * 1_000
-
-        increments = generator.binomial(
-            n=config["status_steps"],
-            p=config["status_probability"],
-            size=(mask.sum(), len(PAY_STATUS_COLUMNS)),
-        )
-        updated_status = np.clip(
-            window_slice[PAY_STATUS_COLUMNS].to_numpy(dtype=int) + increments,
-            -2,
-            8,
-        )
-        drifted.loc[mask, PAY_STATUS_COLUMNS] = updated_status.astype(int)
-
-    drifted["LIMIT_BAL"] = drifted["LIMIT_BAL"].astype(int)
+    drifted = inject_mild(raw_frame, generator)
+    drifted = inject_moderate(drifted, generator)
+    drifted = inject_severe(drifted, generator)
     return drifted
 
 

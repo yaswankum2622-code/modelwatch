@@ -6,6 +6,7 @@ __pycache__/
 venv/
 env/
 .venv/
+data/modelwatch.db
 data/*.db
 data/*.sqlite
 data/*.xls
@@ -32,6 +33,7 @@ models/saved/*.json
 !models/saved/.gitkeep
 reports/generated/*.html
 reports/generated/*.json
+visual's/
 *.egg-info/
 dist/
 build/

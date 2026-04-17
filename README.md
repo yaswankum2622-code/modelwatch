@@ -2,13 +2,13 @@
 title: ModelWatch
 emoji: "🔭"
 colorFrom: indigo
-colorTo: teal
+colorTo: blue
 sdk: docker
 app_port: 7860
 python_version: "3.10"
 fullWidth: true
 header: mini
-short_description: Production ML monitoring and drift detection for credit-risk models.
+short_description: ML drift monitoring for credit-risk models.
 license: mit
 pinned: true
 ---

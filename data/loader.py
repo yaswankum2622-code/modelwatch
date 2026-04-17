@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from urllib.request import Request, urlopen
 
 import pandas as pd
 
@@ -16,6 +17,10 @@ if str(PROJECT_ROOT) not in sys.path:
 from database.db import DB_PATH, get_connection, initialize_database, replace_table
 
 DATASET_PATH = Path(__file__).resolve().with_name("default of credit card clients.xls")
+DATASET_URL = (
+    "https://archive.ics.uci.edu/ml/machine-learning-databases/00350/"
+    "default%20of%20credit%20card%20clients.xls"
+)
 TARGET_COLUMN = "default payment next month"
 WINDOW_SIZE = 7_500
 NUM_WINDOWS = 4
@@ -58,6 +63,7 @@ ORDERED_COLUMNS = [
 
 def load_source_dataframe(dataset_path: str | Path = DATASET_PATH) -> pd.DataFrame:
     """Read and normalize the UCI credit default dataset."""
+    ensure_dataset_exists(dataset_path)
     frame = pd.read_excel(dataset_path, header=1)
     frame = frame.rename(columns={"ID": "record_id", TARGET_COLUMN: "default_label"})
     missing_columns = [column for column in ["record_id", *FEATURE_COLUMNS, "default_label"] if column not in frame.columns]
@@ -65,6 +71,22 @@ def load_source_dataframe(dataset_path: str | Path = DATASET_PATH) -> pd.DataFra
         missing_list = ", ".join(missing_columns)
         raise ValueError(f"Dataset is missing required columns: {missing_list}")
     return frame[["record_id", *FEATURE_COLUMNS, "default_label"]].copy()
+
+
+def ensure_dataset_exists(dataset_path: str | Path = DATASET_PATH) -> Path:
+    """Download the source dataset locally when it is not already present."""
+    path = Path(dataset_path)
+    if path.exists():
+        return path
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    request = Request(
+        DATASET_URL,
+        headers={"User-Agent": "ModelWatch/1.0"},
+    )
+    with urlopen(request, timeout=60) as response:
+        path.write_bytes(response.read())
+    return path
 
 
 def assign_windows(frame: pd.DataFrame, random_seed: int = RANDOM_SEED) -> pd.DataFrame:

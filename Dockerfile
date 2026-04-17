@@ -18,6 +18,15 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
+RUN python data/loader.py && \
+    python data/drift_injector.py && \
+    python models/lgbm_model.py && \
+    python models/isolation_forest.py && \
+    python models/autoencoder.py && \
+    python models/lstm_forecast.py && \
+    python models/champion_challenger.py && \
+    rm -f "data/default of credit card clients.xls"
+
 EXPOSE 7860
 
 CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=7860", "--server.headless=true"]

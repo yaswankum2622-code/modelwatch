@@ -318,6 +318,18 @@ def hero_banner(title: str, subtitle: str, selected_label: str, status: str, sta
     )
 
 
+def normalize_metric(series: pd.Series, invert: bool = False) -> pd.Series:
+    values = pd.to_numeric(series, errors="coerce").fillna(0.0).astype(float)
+    span = float(values.max() - values.min())
+    if span == 0:
+        normalized = pd.Series(np.zeros(len(values)), index=values.index, dtype=float)
+    else:
+        normalized = (values - values.min()) / span
+    if invert:
+        normalized = 1.0 - normalized
+    return normalized.clip(0.0, 1.0)
+
+
 @st.cache_data(show_spinner=False, ttl=1800)
 def perf_cached() -> pd.DataFrame:
     return get_performance_all_windows()
@@ -365,6 +377,80 @@ def window_frame(window_id: int) -> pd.DataFrame:
     return df
 
 
+@st.cache_data(show_spinner=False, ttl=1800)
+def comparison_frame() -> pd.DataFrame:
+    perf_df = perf_cached()
+    degraded = degraded_cached()
+    rows = []
+    labels = {
+        1: ("W1", "Baseline"),
+        2: ("W2", "Mild Drift"),
+        3: ("W3", "Moderate Drift"),
+        4: ("W4", "Severe Drift"),
+    }
+
+    for window_id in [1, 2, 3, 4]:
+        perf_row = degraded[degraded["window_id"] == window_id].iloc[0]
+        iso_result = iso_cached(window_id)
+        ae_result = ae_cached(window_id)
+        health_status = get_health_status(perf_df, window_id)
+
+        if window_id == 1:
+            max_psi = 0.0
+            mean_psi = 0.0
+            drifted_features = 0
+            top_feature = "-"
+            shap_corr = 1.0
+            red_alerts = 0
+            amber_alerts = 0
+        else:
+            psi_df = psi_cached(window_id)
+            stat_df = stat_cached(window_id)
+            shap_result = shap_cached(window_id)
+            alerts = run_all_alerts(
+                window_id=window_id,
+                psi_df=psi_df,
+                perf_df=perf_df,
+                anomaly_result=iso_result,
+                ae_result=ae_result,
+                shap_result=shap_result,
+            )
+            max_psi = float(psi_df["psi"].max())
+            mean_psi = float(psi_df["psi"].mean())
+            drifted_features = int(stat_df["drift_detected"].sum())
+            top_feature = str(psi_df.iloc[0]["feature"])
+            shap_corr = float(shap_result["spearman_correlation"])
+            red_alerts = sum(1 for alert in alerts if alert["level"] == "RED")
+            amber_alerts = sum(1 for alert in alerts if alert["level"] == "AMBER")
+
+        rows.append(
+            {
+                "window_id": window_id,
+                "window_short": labels[window_id][0],
+                "window_label": labels[window_id][1],
+                "health_status": health_status,
+                "auc_roc": float(perf_row["auc_roc"]),
+                "f1": float(perf_row["f1"]),
+                "precision": float(perf_row["precision"]),
+                "recall": float(perf_row["recall"]),
+                "ks_stat": float(perf_row["ks_stat"]),
+                "auc_degradation_pct": float(perf_row.get("auc_roc_degradation_pct", 0.0)),
+                "max_psi": round(max_psi, 4),
+                "mean_psi": round(mean_psi, 4),
+                "drifted_features": drifted_features,
+                "top_feature": top_feature,
+                "anomaly_rate": float(iso_result["anomaly_rate"]),
+                "ae_ratio": float(ae_result["drift_ratio"]),
+                "shap_corr": round(shap_corr, 4),
+                "red_alerts": red_alerts,
+                "amber_alerts": amber_alerts,
+                "total_alerts": red_alerts + amber_alerts,
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
 window_options = {
     "Window 2 (Mild Drift)": 2,
     "Window 3 (Moderate Drift)": 3,
@@ -388,6 +474,7 @@ with st.sidebar:
         "nav",
         [
             "📊  Overview",
+            "🪟  All Windows",
             "📈  Data Drift",
             "🎯  Model Performance",
             "🧠  Deep Drift",
@@ -437,7 +524,256 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-if "Overview" in page:
+if "All Windows" in page:
+    db_check()
+    models_check()
+
+    try:
+        with st.spinner("Compiling all-window comparison..."):
+            compare_df = comparison_frame()
+
+        forecast_path = SAVED_DIR / "lstm_forecast_result.joblib"
+        forecast = joblib.load(forecast_path) if forecast_path.exists() else None
+        worst_health = (
+            "RED"
+            if (compare_df["health_status"] == "RED").any()
+            else "AMBER"
+            if (compare_df["health_status"] == "AMBER").any()
+            else "GREEN"
+        )
+        peak_alert_row = compare_df.iloc[compare_df["total_alerts"].idxmax()]
+
+        hero_banner(
+            "All Windows Comparison",
+            "A portfolio-wide comparison of baseline, mild, moderate, and severe windows across model quality, drift intensity, anomaly pressure, behaviour drift, and alerts.",
+            "Portfolio View",
+            worst_health,
+            [
+                ("AUC Range", f"{compare_df['auc_roc'].max():.3f} -> {compare_df['auc_roc'].min():.3f}"),
+                ("Worst PSI", f"{compare_df['max_psi'].max():.3f}"),
+                ("Peak Alerts", f"{int(peak_alert_row['total_alerts'])} in {peak_alert_row['window_short']}"),
+                ("Forecast", forecast["recommendation"] if forecast else "FORECAST PENDING"),
+            ],
+        )
+
+        card_cols = st.columns(4)
+        for col, row in zip(card_cols, compare_df.itertuples(index=False)):
+            color = STATUS_COLORS.get(row.health_status, "#888888")
+            col.markdown(
+                f"""
+                <div style='background:
+                            radial-gradient(circle at top left, {color}22, transparent 30%),
+                            #FFFDF8;
+                            border:0.5px solid #E7DECF;
+                            border-radius:18px;padding:1rem 1rem 1.05rem;
+                            box-shadow:0 16px 36px rgba(26,24,20,0.04);
+                            min-height:190px'>
+                  <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem'>
+                    <div style='font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#888'>{row.window_short}</div>
+                    <div style='font-size:0.78rem;color:{MUTED}'>{row.window_label}</div>
+                  </div>
+                  <div style='margin-bottom:0.75rem'>{status_badge(row.health_status)}</div>
+                  <div style='font-size:1.45rem;font-weight:700;font-family:IBM Plex Mono,monospace;color:{INK}'>{row.auc_roc:.3f}</div>
+                  <div style='font-size:0.78rem;color:{color};font-family:IBM Plex Mono,monospace;margin:0.3rem 0 0.9rem'>{row.auc_degradation_pct:+.1f}% AUC</div>
+                  <div style='display:grid;gap:0.32rem;font-size:0.8rem;color:{MUTED}'>
+                    <div style='display:flex;justify-content:space-between'><span>PSI max</span><span style='font-family:IBM Plex Mono,monospace;color:{INK}'>{row.max_psi:.3f}</span></div>
+                    <div style='display:flex;justify-content:space-between'><span>Anomaly rate</span><span style='font-family:IBM Plex Mono,monospace;color:{INK}'>{row.anomaly_rate:.1f}%</span></div>
+                    <div style='display:flex;justify-content:space-between'><span>AE ratio</span><span style='font-family:IBM Plex Mono,monospace;color:{INK}'>{row.ae_ratio:.2f}x</span></div>
+                    <div style='display:flex;justify-content:space-between'><span>Alerts</span><span style='font-family:IBM Plex Mono,monospace;color:{INK}'>{int(row.total_alerts)}</span></div>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        st.divider()
+
+        signal_matrix = pd.DataFrame(
+            {
+                row.window_short: [
+                    float(row.auc_roc),
+                    float(row.max_psi),
+                    float(row.anomaly_rate),
+                    float(row.ae_ratio),
+                    float(row.shap_corr),
+                    float(row.total_alerts),
+                ]
+                for row in compare_df.itertuples(index=False)
+            },
+            index=[
+                "AUC Risk",
+                "PSI Max",
+                "Anomaly Rate",
+                "AE Ratio",
+                "SHAP Drift",
+                "Alert Load",
+            ],
+        )
+        signal_matrix.loc["AUC Risk"] = normalize_metric(compare_df["auc_roc"], invert=True).values
+        signal_matrix.loc["PSI Max"] = normalize_metric(compare_df["max_psi"]).values
+        signal_matrix.loc["Anomaly Rate"] = normalize_metric(compare_df["anomaly_rate"]).values
+        signal_matrix.loc["AE Ratio"] = normalize_metric(compare_df["ae_ratio"]).values
+        signal_matrix.loc["SHAP Drift"] = normalize_metric(compare_df["shap_corr"], invert=True).values
+        signal_matrix.loc["Alert Load"] = normalize_metric(compare_df["total_alerts"]).values
+
+        quality_col, heat_col = st.columns([1.15, 1.35], gap="large")
+
+        with quality_col:
+            fig_map = go.Figure()
+            for row in compare_df.itertuples(index=False):
+                color = STATUS_COLORS.get(row.health_status, "#888888")
+                fig_map.add_trace(
+                    go.Scatter(
+                        x=[row.max_psi],
+                        y=[row.auc_roc],
+                        mode="markers+text",
+                        name=row.window_short,
+                        text=[row.window_short],
+                        textposition="top center",
+                        marker=dict(
+                            size=max(16, 18 + row.total_alerts * 4),
+                            color=color,
+                            opacity=0.85,
+                            line=dict(color="#FFFFFF", width=2),
+                        ),
+                        customdata=[[row.anomaly_rate, row.ae_ratio, row.shap_corr]],
+                        hovertemplate=(
+                            "<b>%{text}</b><br>"
+                            "PSI max=%{x:.3f}<br>"
+                            "AUC=%{y:.3f}<br>"
+                            "Anomaly=%{customdata[0]:.1f}%<br>"
+                            "AE ratio=%{customdata[1]:.2f}x<br>"
+                            "SHAP corr=%{customdata[2]:.3f}<extra></extra>"
+                        ),
+                    )
+                )
+
+            fig_map.add_vline(x=0.10, line_dash="dot", line_color=WARNING)
+            fig_map.add_vline(x=0.25, line_dash="dash", line_color=DANGER)
+            fig_map.add_hline(y=0.75, line_dash="dash", line_color=WARNING)
+            fig_map.update_layout(
+                **CHART_THEME,
+                height=390,
+                title="Quality vs drift map",
+                xaxis_title="PSI max",
+                yaxis_title="AUC-ROC",
+                xaxis=dict(**AXIS_STYLE),
+                yaxis=dict(range=[0.5, 1.0], **AXIS_STYLE),
+                showlegend=False,
+            )
+            st.plotly_chart(fig_map, use_container_width=True)
+
+        with heat_col:
+            fig_signal = go.Figure(
+                go.Heatmap(
+                    z=signal_matrix.values,
+                    x=signal_matrix.columns.tolist(),
+                    y=signal_matrix.index.tolist(),
+                    colorscale=[
+                        [0.0, "#E1F5EE"],
+                        [0.35, "#FAEEDA"],
+                        [0.7, "#FCEBEB"],
+                        [1.0, "#7F1F1F"],
+                    ],
+                    zmin=0,
+                    zmax=1,
+                    text=[[f"{value:.2f}" for value in row] for row in signal_matrix.values],
+                    texttemplate="%{text}",
+                    textfont=dict(size=11),
+                    xgap=6,
+                    ygap=6,
+                    colorbar=dict(title="Risk"),
+                )
+            )
+            fig_signal.update_layout(
+                **EXTERNAL_FIG_THEME,
+                height=390,
+                title="Cross-window signal intensity",
+            )
+            st.plotly_chart(fig_signal, use_container_width=True)
+
+        st.divider()
+
+        alert_col, table_col = st.columns([0.95, 1.45], gap="large")
+
+        with alert_col:
+            fig_alerts = go.Figure()
+            fig_alerts.add_trace(
+                go.Bar(
+                    x=compare_df["window_short"],
+                    y=compare_df["red_alerts"],
+                    name="RED",
+                    marker_color=DANGER,
+                )
+            )
+            fig_alerts.add_trace(
+                go.Bar(
+                    x=compare_df["window_short"],
+                    y=compare_df["amber_alerts"],
+                    name="AMBER",
+                    marker_color=WARNING,
+                )
+            )
+            fig_alerts.update_layout(
+                **CHART_THEME,
+                height=360,
+                title="Alert pressure by window",
+                barmode="stack",
+                xaxis=dict(**AXIS_STYLE),
+                yaxis=dict(**AXIS_STYLE),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+            )
+            st.plotly_chart(fig_alerts, use_container_width=True)
+
+            st.markdown(
+                "<div class='mw-note'>"
+                "<b>Reading the portfolio:</b><br>"
+                "Baseline remains stable while Windows 2 through 4 show a clear rise in drift pressure. "
+                "Window 4 is the break point, combining the worst PSI, highest anomaly load, largest alert volume, and the lowest production AUC."
+                "</div>",
+                unsafe_allow_html=True,
+            )
+
+        with table_col:
+            st.markdown("#### Full window comparison")
+            display_df = compare_df[
+                [
+                    "window_short",
+                    "window_label",
+                    "health_status",
+                    "auc_roc",
+                    "auc_degradation_pct",
+                    "max_psi",
+                    "drifted_features",
+                    "anomaly_rate",
+                    "ae_ratio",
+                    "shap_corr",
+                    "red_alerts",
+                    "amber_alerts",
+                    "top_feature",
+                ]
+            ].rename(
+                columns={
+                    "window_short": "window",
+                    "window_label": "stage",
+                    "health_status": "health",
+                    "auc_roc": "auc",
+                    "auc_degradation_pct": "auc_delta_pct",
+                    "max_psi": "psi_max",
+                    "anomaly_rate": "anomaly_pct",
+                    "top_feature": "worst_feature",
+                }
+            )
+            st.dataframe(
+                display_df,
+                use_container_width=True,
+                hide_index=True,
+            )
+
+    except Exception as e:
+        st.error(f"All windows comparison error: {e}")
+
+elif "Overview" in page:
     db_check()
     models_check()
 

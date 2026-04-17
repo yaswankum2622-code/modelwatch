@@ -1,8 +1,6 @@
 <div align="center">
 
-<img alt="ModelWatch" src="https://img.shields.io/badge/MODELWATCH-detect%20%E2%80%A2%20explain%20%E2%80%A2%20forecast%20%E2%80%A2%20retrain-0F766E?style=for-the-badge&labelColor=111827">
-
-<h1>MODELWATCH</h1>
+<h1><strong>MODELWATCH</strong></h1>
 
 <p><strong>Production ML drift observatory for credit-risk systems.</strong></p>
 <p>Detect distribution shift, performance decay, behaviour drift, anomaly spikes, and retraining readiness before silent model failure compounds into business damage.</p>
@@ -12,21 +10,12 @@
 [![GitHub](https://img.shields.io/badge/GitHub-yaswankum2622--code%2Fmodelwatch-111827?style=for-the-badge)](https://github.com/yaswankum2622-code/modelwatch)
 [![CI](https://img.shields.io/github/actions/workflow/status/yaswankum2622-code/modelwatch/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/yaswankum2622-code/modelwatch/actions)
 
-<br>
-
-![30K Records](https://img.shields.io/badge/30K-real%20records-F59E0B?style=flat-square)
-![4 Windows](https://img.shields.io/badge/4-drift%20windows-0F766E?style=flat-square)
-![23 Features](https://img.shields.io/badge/23-monitored%20features-2563EB?style=flat-square)
-![Window 4 PSI](https://img.shields.io/badge/W4%20PSI-0.9295-D64C43?style=flat-square)
-![Challenger Gain](https://img.shields.io/badge/Challenger-%2B0.0965%20AUC-7C3AED?style=flat-square)
-![Tests](https://img.shields.io/badge/Tests-43%20passing-1D9E75?style=flat-square)
-
-<br>
-
 ModelWatch is a production-style monitoring platform built on the UCI Credit Card Default dataset.  
 It shows the full post-deployment story: the data moves, quality erodes, feature importance shifts, anomalies rise, and the team needs an evidence-based retraining decision.
 
 </div>
+
+![ModelWatch command deck](assets/modelwatch-command-deck.svg)
 
 ---
 
@@ -67,6 +56,8 @@ A **window** is one batch of production records observed later in time.
 - **Window 4** introduces severe drift.
 
 This creates a realistic monitoring story: the model is good at launch, then the environment changes.
+
+![Window comparison](assets/modelwatch-window-comparison.svg)
 
 ### Window summary from the current run
 
@@ -126,7 +117,7 @@ This is the core operating view of the project: one baseline and three progressi
 | **PSI heatmap** | Feature-level distribution shift across windows | Darker cells mean the feature has moved further away from the baseline distribution |
 | **Feature trajectory spotlight** | Raw movement of top drifted features | Useful for understanding *how* a feature is changing, not just that it changed |
 | **Performance observatory** | AUC, F1, precision, recall over time | Shows whether the model is still separating risky vs safe customers well |
-| **Champion-challenger panel** | Whether retraining actually helps | Turns “we should retrain” into a measurable before/after comparison |
+| **Champion-challenger panel** | Whether retraining actually helps | Turns `we should retrain` into a measurable before/after comparison |
 | **Deep drift lab** | Autoencoder and Isolation Forest signals | Captures stress even when classical feature thresholds do not yet look extreme |
 | **SHAP drift page** | Feature-importance rank movement | Detects behaviour drift: the model may still run, but for the wrong reasons |
 | **Executive drift narrative** | AI-generated explanation for stakeholders | Converts monitoring metrics into an action-oriented operational brief |
@@ -220,16 +211,16 @@ flowchart LR
 
 ```text
 MODELWATCH/
-├── app.py
-├── dashboard/
-├── data/
-├── database/
-├── models/
-├── monitoring/
-├── reports/
-├── tests/
-├── .github/workflows/ci.yml
-└── ci_setup.py
+|-- app.py
+|-- dashboard/
+|-- data/
+|-- database/
+|-- models/
+|-- monitoring/
+|-- reports/
+|-- tests/
+|-- .github/workflows/ci.yml
+`-- ci_setup.py
 ```
 
 ### Key modules

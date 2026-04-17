@@ -1,0 +1,67 @@
+<svg width="1200" height="500" viewBox="0 0 1200 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="60" y1="40" x2="1140" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF9F0"/>
+      <stop offset="0.52" stop-color="#F8F5EE"/>
+      <stop offset="1" stop-color="#EAF5F4"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="500" rx="28" fill="url(#bg2)"/>
+  <text x="72" y="78" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800" fill="#111827">All Windows at a Glance</text>
+  <text x="72" y="112" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#475569">One baseline window, then three increasingly stressed production periods.</text>
+
+  <g>
+    <rect x="72" y="154" width="252" height="278" rx="22" fill="#FFFFFF" stroke="#D8E7E2"/>
+    <text x="96" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280">WINDOW 1</text>
+    <text x="96" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#111827">Baseline</text>
+    <rect x="96" y="244" width="74" height="26" rx="13" fill="#DDF5EF" stroke="#9BD4C3"/>
+    <text x="133" y="261" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#0F766E">GREEN</text>
+    <text x="96" y="314" font-family="Consolas, monospace" font-size="32" font-weight="700" fill="#111827">0.9258</text>
+    <text x="96" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#64748B">AUC</text>
+    <text x="96" y="382" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">PSI 0.0000</text>
+    <text x="96" y="410" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">Anomaly 5.00%</text>
+  </g>
+
+  <g>
+    <rect x="340" y="154" width="252" height="278" rx="22" fill="#FFFFFF" stroke="#E9E2D1"/>
+    <text x="364" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280">WINDOW 2</text>
+    <text x="364" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#111827">Mild Drift</text>
+    <rect x="364" y="244" width="60" height="26" rx="13" fill="#FFF2D8" stroke="#F2C47A"/>
+    <text x="394" y="261" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#B46B00">WATCH</text>
+    <text x="364" y="314" font-family="Consolas, monospace" font-size="32" font-weight="700" fill="#111827">0.7521</text>
+    <text x="364" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#64748B">AUC</text>
+    <text x="364" y="382" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">PSI 0.0492</text>
+    <text x="364" y="410" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">Anomaly 5.99%</text>
+  </g>
+
+  <g>
+    <rect x="608" y="154" width="252" height="278" rx="22" fill="#FFFFFF" stroke="#EFD8D5"/>
+    <text x="632" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280">WINDOW 3</text>
+    <text x="632" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#111827">Moderate Drift</text>
+    <rect x="632" y="244" width="58" height="26" rx="13" fill="#FCE8E7" stroke="#F4B7B4"/>
+    <text x="661" y="261" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#D64C43">RED</text>
+    <text x="632" y="314" font-family="Consolas, monospace" font-size="32" font-weight="700" fill="#111827">0.7334</text>
+    <text x="632" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#64748B">AUC</text>
+    <text x="632" y="382" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">PSI 0.2834</text>
+    <text x="632" y="410" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">Anomaly 9.25%</text>
+  </g>
+
+  <g>
+    <rect x="876" y="154" width="252" height="278" rx="22" fill="#FFFFFF" stroke="#E6C5C2"/>
+    <text x="900" y="190" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280">WINDOW 4</text>
+    <text x="900" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#111827">Severe Drift</text>
+    <rect x="900" y="244" width="58" height="26" rx="13" fill="#FCE8E7" stroke="#F4B7B4"/>
+    <text x="929" y="261" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#D64C43">RED</text>
+    <text x="900" y="314" font-family="Consolas, monospace" font-size="32" font-weight="700" fill="#111827">0.6553</text>
+    <text x="900" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#64748B">AUC</text>
+    <text x="900" y="382" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">PSI 0.9189</text>
+    <text x="900" y="410" font-family="Consolas, monospace" font-size="18" font-weight="700" fill="#111827">Anomaly 16.53%</text>
+  </g>
+
+  <path d="M198 468C308 452 372 398 470 390C572 382 646 404 736 376C824 348 910 280 1002 246" stroke="#0F766E" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="198" cy="468" r="7" fill="#0F766E"/>
+  <circle cx="470" cy="390" r="7" fill="#B46B00"/>
+  <circle cx="736" cy="376" r="7" fill="#D64C43"/>
+  <circle cx="1002" cy="246" r="7" fill="#7F1D1D"/>
+</svg>

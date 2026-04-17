@@ -10,6 +10,7 @@ import pandas as pd
 import sqlite3
 from functools import lru_cache
 from pathlib import Path
+from scipy.spatial.distance import jensenshannon
 from scipy.stats import spearmanr
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -79,17 +80,31 @@ def compute_shap_drift(window_id: int) -> dict:
     rank_w1 = imp_w1[common].rank(ascending=False)
     rank_wn = imp_wn[common].rank(ascending=False)
     rank_changes = (rank_wn - rank_w1).abs().sort_values(ascending=False)
+    top_k = min(6, len(common))
+    relative_shift = float(
+        (
+            (imp_wn[common].head(top_k) - imp_w1[common].head(top_k)).abs()
+            / imp_w1[common].head(top_k).replace(0, 1e-9)
+        ).mean()
+    )
+    baseline_weights = imp_w1[common].to_numpy(dtype=float)
+    current_weights = imp_wn[common].to_numpy(dtype=float)
+    baseline_weights = baseline_weights / baseline_weights.sum()
+    current_weights = current_weights / current_weights.sum()
+    importance_jsd = float(jensenshannon(baseline_weights, current_weights))
 
     status = (
-        "SEVERE" if corr < 0.6 else
-        "MODERATE" if corr < 0.8 else
-        "MILD" if corr < 0.9 else
+        "SEVERE" if corr < 0.6 or relative_shift > 0.75 else
+        "MODERATE" if corr < 0.8 or relative_shift > 0.35 or importance_jsd > 0.05 else
+        "MILD" if corr < 0.9 or relative_shift > 0.20 or importance_jsd > 0.02 else
         "HEALTHY"
     )
 
     return {
         "window_id": window_id,
         "spearman_correlation": round(float(corr), 4),
+        "importance_jsd": round(importance_jsd, 4),
+        "relative_shift_top_features": round(relative_shift, 4),
         "status": status,
         "top_movers": rank_changes.head(5).to_dict(),
         "baseline_top3": imp_w1.head(3).index.tolist(),

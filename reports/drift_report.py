@@ -40,7 +40,7 @@ def generate_drift_report(
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
-            "gemini-2.5-flash-preview-04-17"
+            "gemini-2.5-flash"
         )
 
         red_alerts = [a for a in alerts if a["level"] == "RED"]

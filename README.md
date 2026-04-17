@@ -1,31 +1,20 @@
----
-title: ModelWatch
-emoji: "🔭"
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-app_file: app.py
-app_port: 7860
-python_version: "3.10"
-fullWidth: true
-header: mini
-short_description: Credit-risk ML drift observatory.
-license: mit
-pinned: true
----
-
 <div align="center">
+
+<img alt="ModelWatch" src="https://img.shields.io/badge/MODELWATCH-credit--risk%20ml%20drift%20observatory-0F766E?style=for-the-badge&labelColor=111827">
 
 <h1>MODELWATCH</h1>
 
 <p><strong>Production ML drift observatory for credit-risk systems.</strong></p>
-<p>Detect distribution shift, performance decay, behaviour drift, anomaly spikes, and retraining readiness before the model silently fails in production.</p>
+<p>Detect distribution shift, performance decay, behaviour drift, anomaly spikes, and retraining readiness before silent model failure compounds into business damage.</p>
 
 [![Live App](https://img.shields.io/badge/Live%20App-yaswtutu--modelwatch-0F766E?style=for-the-badge)](https://yaswtutu-modelwatch.hf.space)
 [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-F59E0B?style=for-the-badge)](https://huggingface.co/spaces/yaswtutu/modelwatch)
 [![GitHub](https://img.shields.io/badge/GitHub-yaswankum2622--code%2Fmodelwatch-111827?style=for-the-badge)](https://github.com/yaswankum2622-code/modelwatch)
 [![CI](https://img.shields.io/github/actions/workflow/status/yaswankum2622-code/modelwatch/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/yaswankum2622-code/modelwatch/actions)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-2563EB?style=for-the-badge)](https://www.python.org/)
+[![LightGBM](https://img.shields.io/badge/LightGBM-FF6B35?style=for-the-badge)](https://lightgbm.readthedocs.io/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge)](https://www.tensorflow.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge)](https://streamlit.io/)
 
 <br>
 
@@ -48,24 +37,18 @@ ModelWatch focuses on that operational layer:
 - **Behaviour drift:** SHAP feature-importance rank correlation
 - **Decision support:** champion-challenger retraining loop, LSTM drift forecasting, Gemini-generated executive report
 
----
+> A deployed model rarely fails loudly.  
+> It drifts quietly, keeps scoring confidently, and starts making worse decisions on data it no longer understands.  
+> **ModelWatch is built to catch that before operators notice only after the damage.**
 
-## Live system at a glance
+## At a glance
 
-<table>
-  <tr>
-    <td><b>Dataset</b><br>30,000 real credit-card clients</td>
-    <td><b>Feature set</b><br>23 production features</td>
-    <td><b>Monitoring periods</b><br>4 windows of 7,500 records each</td>
-    <td><b>Deployment</b><br>Docker Space on Hugging Face</td>
-  </tr>
-  <tr>
-    <td><b>Champion model</b><br>LightGBM on Window 1</td>
-    <td><b>Deep detectors</b><br>Isolation Forest + Autoencoder</td>
-    <td><b>Forecasting</b><br>LSTM predicts next-window PSI</td>
-    <td><b>Narrative layer</b><br>Gemini executive drift report</td>
-  </tr>
-</table>
+- **Dataset:** UCI Credit Card Default, 30,000 real customer records
+- **Feature space:** 23 monitored production features across demographics, balances, payments, and delinquency
+- **Monitoring story:** 1 baseline window plus 3 progressively drifted windows
+- **Detection stack:** PSI, KS, JS divergence, chi-square, SHAP drift, Isolation Forest, autoencoder, Evidently AI
+- **Decision layer:** champion-challenger retraining loop, LSTM drift forecast, Gemini executive report
+- **Deployment:** multi-page Streamlit dashboard live on Hugging Face Spaces
 
 ---
 

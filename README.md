@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="ModelWatch" src="https://img.shields.io/badge/MODELWATCH-credit--risk%20ml%20drift%20observatory-0F766E?style=for-the-badge&labelColor=111827">
+<img alt="ModelWatch" src="https://img.shields.io/badge/MODELWATCH-detect%20%E2%80%A2%20explain%20%E2%80%A2%20forecast%20%E2%80%A2%20retrain-0F766E?style=for-the-badge&labelColor=111827">
 
 <h1>MODELWATCH</h1>
 
@@ -11,10 +11,15 @@
 [![Hugging Face Space](https://img.shields.io/badge/Hugging%20Face-Space-F59E0B?style=for-the-badge)](https://huggingface.co/spaces/yaswtutu/modelwatch)
 [![GitHub](https://img.shields.io/badge/GitHub-yaswankum2622--code%2Fmodelwatch-111827?style=for-the-badge)](https://github.com/yaswankum2622-code/modelwatch)
 [![CI](https://img.shields.io/github/actions/workflow/status/yaswankum2622-code/modelwatch/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/yaswankum2622-code/modelwatch/actions)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-2563EB?style=for-the-badge)](https://www.python.org/)
-[![LightGBM](https://img.shields.io/badge/LightGBM-FF6B35?style=for-the-badge)](https://lightgbm.readthedocs.io/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge)](https://www.tensorflow.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge)](https://streamlit.io/)
+
+<br>
+
+![30K Records](https://img.shields.io/badge/30K-real%20records-F59E0B?style=flat-square)
+![4 Windows](https://img.shields.io/badge/4-drift%20windows-0F766E?style=flat-square)
+![23 Features](https://img.shields.io/badge/23-monitored%20features-2563EB?style=flat-square)
+![Window 4 PSI](https://img.shields.io/badge/W4%20PSI-0.9295-D64C43?style=flat-square)
+![Challenger Gain](https://img.shields.io/badge/Challenger-%2B0.0965%20AUC-7C3AED?style=flat-square)
+![Tests](https://img.shields.io/badge/Tests-43%20passing-1D9E75?style=flat-square)
 
 <br>
 

@@ -1,20 +1,23 @@
-FROM python:3.13.5-slim
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
-    git \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt ./
-COPY src/ ./src/
+COPY requirements.txt requirements.txt
 
-RUN pip3 install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-EXPOSE 8501
+COPY . .
 
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+EXPOSE 7860
 
-ENTRYPOINT ["streamlit", "run", "src/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=7860", "--server.headless=true"]

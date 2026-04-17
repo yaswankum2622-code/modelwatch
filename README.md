@@ -1,19 +1,35 @@
 ---
-title: Modelwatch
-emoji: 🚀
-colorFrom: red
-colorTo: red
+title: ModelWatch
+emoji: "🔭"
+colorFrom: blue
+colorTo: green
 sdk: docker
-app_port: 8501
+app_port: 7860
+python_version: "3.10"
+fullWidth: true
+header: mini
+short_description: Wide MLOps dashboard for drift and model health.
 tags:
-- streamlit
+  - streamlit
+  - mlops
+  - drift-detection
+  - explainability
+  - monitoring
+  - lightgbm
+  - tensorflow
 pinned: false
-short_description: Streamlit template space
 ---
 
-# Welcome to Streamlit!
+# ModelWatch
 
-Edit `/src/streamlit_app.py` to customize this app to your heart's desire. :heart:
+ModelWatch is a production-style monitoring surface for a credit-risk model trained on the UCI Credit Card Default dataset.
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+The dashboard tracks:
+
+- data drift with PSI, KS, JS divergence, chi-square tests, and Evidently reports
+- model degradation with AUC, F1, precision, recall, and KS tracking
+- deep drift signals with Isolation Forest, autoencoder reconstruction error, and LSTM PSI forecasting
+- behaviour drift with SHAP rank-correlation analysis
+- alerting, challenger retraining, and Gemini-generated monitoring reports
+
+The Space runs as a Dockerized Streamlit app on Hugging Face Spaces.

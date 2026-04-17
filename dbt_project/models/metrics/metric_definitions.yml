@@ -1,0 +1,41 @@
+version: 2
+metrics:
+  - name: model_auc
+    label: Model AUC-ROC
+    description: "Area under ROC curve per monitoring window"
+    type: ratio
+    owner: mlops_team
+    last_modified: "2026-04-16"
+    tags: [performance, core]
+
+  - name: psi_score
+    label: Population Stability Index
+    description: "Distribution shift score. > 0.25 triggers retrain alert"
+    type: ratio
+    owner: mlops_team
+    last_modified: "2026-04-16"
+    tags: [drift, core, alert]
+
+  - name: anomaly_rate
+    label: Anomaly Rate
+    description: "Percentage of records flagged as anomalous by Isolation Forest"
+    type: percentage
+    owner: mlops_team
+    last_modified: "2026-04-16"
+    tags: [drift, diagnostic]
+
+  - name: reconstruction_error
+    label: Autoencoder Reconstruction Error
+    description: "Mean reconstruction error from autoencoder. Spikes indicate drift"
+    type: ratio
+    owner: mlops_team
+    last_modified: "2026-04-16"
+    tags: [drift, neural]
+
+  - name: shap_rank_correlation
+    label: SHAP Importance Rank Correlation
+    description: "Spearman correlation of feature importance ranks vs baseline. < 0.8 = behaviour drift"
+    type: ratio
+    owner: mlops_team
+    last_modified: "2026-04-16"
+    tags: [drift, explainability]

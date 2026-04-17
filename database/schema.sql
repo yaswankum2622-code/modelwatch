@@ -1,0 +1,94 @@
+CREATE TABLE IF NOT EXISTS credit_records_raw (
+    record_id INTEGER PRIMARY KEY,
+    window_id INTEGER NOT NULL,
+    window_name TEXT NOT NULL,
+    window_row_number INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
+    LIMIT_BAL REAL NOT NULL,
+    SEX INTEGER NOT NULL,
+    EDUCATION INTEGER NOT NULL,
+    MARRIAGE INTEGER NOT NULL,
+    AGE INTEGER NOT NULL,
+    PAY_0 INTEGER NOT NULL,
+    PAY_2 INTEGER NOT NULL,
+    PAY_3 INTEGER NOT NULL,
+    PAY_4 INTEGER NOT NULL,
+    PAY_5 INTEGER NOT NULL,
+    PAY_6 INTEGER NOT NULL,
+    BILL_AMT1 REAL NOT NULL,
+    BILL_AMT2 REAL NOT NULL,
+    BILL_AMT3 REAL NOT NULL,
+    BILL_AMT4 REAL NOT NULL,
+    BILL_AMT5 REAL NOT NULL,
+    BILL_AMT6 REAL NOT NULL,
+    PAY_AMT1 REAL NOT NULL,
+    PAY_AMT2 REAL NOT NULL,
+    PAY_AMT3 REAL NOT NULL,
+    PAY_AMT4 REAL NOT NULL,
+    PAY_AMT5 REAL NOT NULL,
+    PAY_AMT6 REAL NOT NULL,
+    default_label INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS credit_records (
+    record_id INTEGER PRIMARY KEY,
+    window_id INTEGER NOT NULL,
+    window_name TEXT NOT NULL,
+    window_row_number INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
+    LIMIT_BAL REAL NOT NULL,
+    SEX INTEGER NOT NULL,
+    EDUCATION INTEGER NOT NULL,
+    MARRIAGE INTEGER NOT NULL,
+    AGE INTEGER NOT NULL,
+    PAY_0 INTEGER NOT NULL,
+    PAY_2 INTEGER NOT NULL,
+    PAY_3 INTEGER NOT NULL,
+    PAY_4 INTEGER NOT NULL,
+    PAY_5 INTEGER NOT NULL,
+    PAY_6 INTEGER NOT NULL,
+    BILL_AMT1 REAL NOT NULL,
+    BILL_AMT2 REAL NOT NULL,
+    BILL_AMT3 REAL NOT NULL,
+    BILL_AMT4 REAL NOT NULL,
+    BILL_AMT5 REAL NOT NULL,
+    BILL_AMT6 REAL NOT NULL,
+    PAY_AMT1 REAL NOT NULL,
+    PAY_AMT2 REAL NOT NULL,
+    PAY_AMT3 REAL NOT NULL,
+    PAY_AMT4 REAL NOT NULL,
+    PAY_AMT5 REAL NOT NULL,
+    PAY_AMT6 REAL NOT NULL,
+    default_label INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS window_summary (
+    dataset_stage TEXT NOT NULL,
+    window_id INTEGER NOT NULL,
+    window_name TEXT NOT NULL,
+    total_records INTEGER NOT NULL,
+    default_rate REAL NOT NULL,
+    bill_amt1_mean REAL NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (dataset_stage, window_id)
+);
+
+CREATE TABLE IF NOT EXISTS predictions (
+    record_id INTEGER NOT NULL,
+    window_id INTEGER NOT NULL,
+    window_name TEXT NOT NULL,
+    prediction_proba REAL,
+    prediction_label INTEGER,
+    actual_label INTEGER,
+    timestamp TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_credit_records_raw_window
+    ON credit_records_raw (window_id, record_id);
+
+CREATE INDEX IF NOT EXISTS idx_credit_records_window
+    ON credit_records (window_id, record_id);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_window
+    ON predictions (window_id, timestamp);

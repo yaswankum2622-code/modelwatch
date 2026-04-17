@@ -1,0 +1,22 @@
+.git
+.github
+.env
+.venv
+venv
+env
+__pycache__
+**/__pycache__
+.pytest_cache
+.vscode
+.idea
+*.pyc
+*.pyo
+*.log
+*.tmp
+data/default of credit card clients.xls
+dbt_project/target
+dbt_project/logs
+dbt_project/.user.yml
+docs
+tests
+modelwatch_scope_freeze.md
